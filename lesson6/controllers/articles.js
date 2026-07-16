@@ -12,4 +12,11 @@ const schema = new mongoose.Schema({
 
 const Article = mongoose.model("articles", schema);
 
-export const router = Router();
+const router = Router();
+
+router.get("/", async (req, res) => {
+    const data = await Article.find();
+    res.send(data);
+});
+
+export default router;
