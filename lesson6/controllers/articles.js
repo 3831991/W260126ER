@@ -35,6 +35,25 @@ router.post("/", async (req, res) => {
     res.send(article);
 });
 
+router.put("/:id", async (req, res) => {
+    const { publishDate, headline, description, content, imgUrl } = req.body;
+
+    const article = await Article.findById(req.params.id);
+
+    if (!article) {
+        return res.status(400).send({ message: "Article not found" });
+    }
+
+    article.publishDate = publishDate;
+    article.headline    = headline;
+    article.description = description;
+    article.content     = content;
+    article.imgUrl      = imgUrl;
+
+    await article.save();
+    res.end();
+});
+
 router.delete("/:id", async (req, res) => {
     await Article.findByIdAndDelete(req.params.id);
     res.end();
