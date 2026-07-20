@@ -19,6 +19,11 @@ router.get("/", async (req, res) => {
     res.send(data);
 });
 
+router.get("/:id", async (req, res) => {
+    const article = await Article.findById(req.params.id);
+    res.send(article);
+});
+
 router.post("/", async (req, res) => {
     const { publishDate, headline, description, content, imgUrl } = req.body;
 
