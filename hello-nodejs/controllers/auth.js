@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from 'jsonwebtoken';
 import { Router } from 'express';
 import { JWT_SECRET } from "../config.js";
+import guard from '../services/guard.js'
 
 const schema = new mongoose.Schema({
     firstName: String,
@@ -59,6 +60,19 @@ router.post("/login", async (req, res) => {
     const token = jwt.sign(obj, JWT_SECRET, { expiresIn: '15m' });
 
     res.send(token);
+});
+
+router.get("/renew-token", guard, async (req, res) => {
+    const data = jwt.decode(req.headers.authorization);
+
+    const obj = {
+        userId: data.userId,
+        fullName: data.fullName,
+    }
+
+    const token = jwt.sign(obj, JWT_SECRET, { expiresIn: '15m' });
+
+    res.send(token); 
 });
 
 export default router;

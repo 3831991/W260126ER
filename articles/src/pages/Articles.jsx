@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getArticles } from '../api/articles';
+import { createArticle, deleteArticle, getArticles, updateArticle } from '../api/articles';
 import { useAuth } from '../context/useAuth';
+import ArticleForm from './ArticleForm';
 import './Articles.css';
 
 const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600';
@@ -19,6 +20,8 @@ function Articles() {
   const [articles, setArticles] = useState([]);
   const [status, setStatus] = useState('loading');
   const [reloadToken, setReloadToken] = useState(0);
+  const [editingArticle, setEditingArticle] = useState(null);
+  const [isFormOpen, setIsFormOpen] = useState(false);
   const { logout } = useAuth();
   const navigate = useNavigate();
 
@@ -50,6 +53,39 @@ function Articles() {
     navigate('/login', { replace: true });
   }
 
+  function openAddForm() {
+    setEditingArticle(null);
+    setIsFormOpen(true);
+  }
+
+  function openEditForm(article) {
+    setEditingArticle(article);
+    setIsFormOpen(true);
+  }
+
+  function closeForm() {
+    setIsFormOpen(false);
+    setEditingArticle(null);
+  }
+
+  async function handleFormSubmit(articleData) {
+    if (editingArticle) {
+      await updateArticle(editingArticle._id, articleData);
+    } else {
+      await createArticle(articleData);
+    }
+    closeForm();
+    setReloadToken((n) => n + 1);
+  }
+
+  async function handleDelete(article) {
+    const confirmed = window.confirm(`למחוק את הכתבה "${article.headline}"?`);
+    if (!confirmed) return;
+
+    await deleteArticle(article._id);
+    setReloadToken((n) => n + 1);
+  }
+
   return (
     <div className="articles-page">
       <header className="articles-header">
@@ -66,8 +102,13 @@ function Articles() {
 
       <main className="articles-main">
         <div className="articles-intro">
-          <h2>הכתבות האחרונות שלנו</h2>
-          <p>כל מה שמעניין, חם ומעודכן במקום אחד.</p>
+          <div>
+            <h2>הכתבות האחרונות שלנו</h2>
+            <p>כל מה שמעניין, חם ומעודכן במקום אחד.</p>
+          </div>
+          <button className="add-article-btn" onClick={openAddForm}>
+            <i className="fa-solid fa-plus" /> כתבה חדשה
+          </button>
         </div>
 
         {status === 'loading' && (
@@ -113,8 +154,11 @@ function Articles() {
                     <p className="article-description">{article.description}</p>
 
                     <div className="article-footer">
-                      <button>
-                        לקריאת הכתבה <i className="fa-solid fa-arrow-left" />
+                      <button className="article-edit-btn" onClick={() => openEditForm(article)}>
+                        <i className="fa-solid fa-pen" /> עריכה
+                      </button>
+                      <button className="article-delete-btn" onClick={() => handleDelete(article)}>
+                        <i className="fa-solid fa-trash" /> מחיקה
                       </button>
                     </div>
                   </div>
@@ -128,6 +172,14 @@ function Articles() {
       <footer className="articles-footer">
         <p>© 2026 כל הזכויות שמורות לפורטל החדשות שלך</p>
       </footer>
+
+      {isFormOpen && (
+        <ArticleForm
+          initialArticle={editingArticle}
+          onCancel={closeForm}
+          onSubmit={handleFormSubmit}
+        />
+      )}
     </div>
   );
 }
