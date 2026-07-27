@@ -1,0 +1,21 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: 'Heebo', sans-serif;
+  background-color: #f8fafc;
+  color: #1e293b;
+}
+
+button,
+input {
+  font-family: inherit;
+}

@@ -1,0 +1,22 @@
+import { useState } from 'react';
+import { AuthContext } from './auth-context';
+
+export function AuthProvider({ children }) {
+  const [token, setToken] = useState(() => localStorage.getItem('token'));
+
+  function loginWithToken(newToken) {
+    localStorage.setItem('token', newToken);
+    setToken(newToken);
+  }
+
+  function logout() {
+    localStorage.removeItem('token');
+    setToken(null);
+  }
+
+  return (
+    <AuthContext.Provider value={{ token, isAuthenticated: Boolean(token), loginWithToken, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
