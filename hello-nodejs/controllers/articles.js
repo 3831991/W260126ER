@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { Router } from 'express';
+import guard from '../services/guard.js'
 
 const schema = new mongoose.Schema({
     addedTime: { type: Date, default: Date.now },
@@ -14,7 +15,7 @@ const Article = mongoose.model("articles", schema);
 
 const router = Router();
 
-router.get("/", async (req, res) => {
+router.get("/", guard, async (req, res) => {
     const data = await Article.find();
     res.send(data);
 });

@@ -1,7 +1,11 @@
 const API_URL = 'http://localhost:3000';
 
 export async function getArticles() {
-  const res = await fetch(`${API_URL}/articles`);
+  const res = await fetch(`${API_URL}/articles`, {
+    headers: {
+      Authorization: localStorage.getItem("token"),
+    }
+  });
 
   if (!res.ok) {
     throw new Error('לא הצלחנו למשוך את הכתבות מהשרת');

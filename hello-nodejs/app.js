@@ -18,6 +18,11 @@ app.use(cors({
     allowedHeaders: 'Content-Type, Accept, Authorization',
 }));
 
+app.use((req, res, next) => {
+    console.log(req.method, req.url);
+    next();
+});
+
 app.use("/", AuthRouter);
 app.use("/articles", ArticlesRouter);
 
