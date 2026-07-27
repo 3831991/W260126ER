@@ -20,12 +20,12 @@ router.get("/", guard, async (req, res) => {
     res.send(data);
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", guard, async (req, res) => {
     const article = await Article.findById(req.params.id);
     res.send(article);
 });
 
-router.post("/", async (req, res) => {
+router.post("/", guard, async (req, res) => {
     const { publishDate, headline, description, content, imgUrl } = req.body;
 
     const obj = new Article({
@@ -41,7 +41,7 @@ router.post("/", async (req, res) => {
     res.send(article);
 });
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", guard, async (req, res) => {
     const { publishDate, headline, description, content, imgUrl } = req.body;
 
     const article = await Article.findById(req.params.id);
@@ -60,7 +60,7 @@ router.put("/:id", async (req, res) => {
     res.end();
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", guard, async (req, res) => {
     await Article.findByIdAndDelete(req.params.id);
     res.end();
 });
