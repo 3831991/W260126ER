@@ -28,7 +28,7 @@ export function AuthProvider({ children }) {
   }, [token])
 
   return (
-    <AuthContext.Provider value={{ token, isAuthenticated: Boolean(token), loginWithToken, logout, user }}>
+    <AuthContext.Provider value={{ token, isAuthenticated: Boolean(token), loginWithToken, logout, user, tokenExp }}>
       {children}
     </AuthContext.Provider>
   );

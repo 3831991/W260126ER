@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { createArticle, deleteArticle, getArticles, updateArticle } from '../api/articles';
 import { useAuth } from '../context/useAuth';
 import ArticleForm from './ArticleForm';
+import moment from 'moment';
 import './Articles.css';
 
 const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600';
@@ -22,7 +23,7 @@ function Articles() {
   const [reloadToken, setReloadToken] = useState(0);
   const [editingArticle, setEditingArticle] = useState(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const { logout, user } = useAuth();
+  const { logout, user, tokenExp } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -100,7 +101,8 @@ function Articles() {
           </div>
         </div>
       </header>
-
+{/* לא לשכוח למחוק */}
+<b style={{ textAlign: 'center' }}>{moment(tokenExp).format('DD/MM/yyyy HH:mm')} | {moment(tokenExp).fromNow()}</b>
       <main className="articles-main">
         <div className="articles-intro">
           <div>
