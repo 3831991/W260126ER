@@ -36,3 +36,17 @@ export async function signup({ firstName, lastName, email, password }) {
 
   return res.json();
 }
+
+export async function renewToken() {
+  const res = await fetch(`${API_URL}/renew-token`, {
+    headers: {
+      Authorization: localStorage.getItem('token'),
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error(await parseError(res));
+  }
+
+  return res.text();
+}

@@ -57,7 +57,7 @@ router.post("/login", async (req, res) => {
         fullName: `${userFind.firstName} ${userFind.lastName}`,
     }
 
-    const token = jwt.sign(obj, JWT_SECRET, { expiresIn: '15m' });
+    const token = jwt.sign(obj, JWT_SECRET, { expiresIn: '6m' });
 
     res.send(token);
 });
