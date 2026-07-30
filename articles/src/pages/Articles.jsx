@@ -22,7 +22,7 @@ function Articles() {
   const [reloadToken, setReloadToken] = useState(0);
   const [editingArticle, setEditingArticle] = useState(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -95,7 +95,7 @@ function Articles() {
             <h1>חדשות <span>היום</span></h1>
           </div>
           <div>
-            <b>שלום אורח! </b>
+            <b>שלום {user?.fullName || 'אורח'}! </b>
             <button className="logout-btn" onClick={handleLogout}>התנתק</button>
           </div>
         </div>

@@ -3,7 +3,6 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { login } from '../api/auth';
 import { useAuth } from '../context/useAuth';
 import './Auth.css';
-import { UserDataContext } from '../App';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -15,8 +14,6 @@ function Login() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { setToken } = useContext(UserDataContext);
-
   async function handleSubmit(e) {
     e.preventDefault();
     setError('');
@@ -25,7 +22,6 @@ function Login() {
     try {
       const token = await login({ email, password });
       loginWithToken(token);
-      setToken(token);
       const redirectTo = location.state?.from ?? '/articles';
       navigate(redirectTo, { replace: true });
     } catch (err) {
