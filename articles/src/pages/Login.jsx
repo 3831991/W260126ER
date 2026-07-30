@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { login } from '../api/auth';
 import { useAuth } from '../context/useAuth';
 import './Auth.css';
+import { jwtDecode } from "jwt-decode";
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -22,6 +23,11 @@ function Login() {
     try {
       const token = await login({ email, password });
       loginWithToken(token);
+
+      const payload = jwtDecode(token);
+      const exp = new Date(payload.exp * 1000);
+      console.log(exp)
+
       const redirectTo = location.state?.from ?? '/articles';
       navigate(redirectTo, { replace: true });
     } catch (err) {
