@@ -94,9 +94,10 @@ function Articles() {
             <i className="fa-solid fa-newspaper" />
             <h1>חדשות <span>היום</span></h1>
           </div>
-          <button className="logout-btn" onClick={handleLogout}>
-            התנתקות
-          </button>
+          <div>
+            <b>שלום אורח! </b>
+            <button className="logout-btn" onClick={handleLogout}>התנתק</button>
+          </div>
         </div>
       </header>
 

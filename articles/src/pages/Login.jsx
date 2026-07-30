@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { login } from '../api/auth';
 import { useAuth } from '../context/useAuth';
 import './Auth.css';
-import { jwtDecode } from "jwt-decode";
+import { UserDataContext } from '../App';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -15,6 +15,8 @@ function Login() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const { setToken } = useContext(UserDataContext);
+
   async function handleSubmit(e) {
     e.preventDefault();
     setError('');
@@ -23,11 +25,7 @@ function Login() {
     try {
       const token = await login({ email, password });
       loginWithToken(token);
-
-      const payload = jwtDecode(token);
-      const exp = new Date(payload.exp * 1000);
-      console.log(exp)
-
+      setToken(token);
       const redirectTo = location.state?.from ?? '/articles';
       navigate(redirectTo, { replace: true });
     } catch (err) {
