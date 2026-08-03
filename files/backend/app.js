@@ -12,7 +12,7 @@ app.use(cors({
 }));
 
 app.use('/files', express.static('images'));
-app.use('/images', ImagesRouter)
+app.use('/images', ImagesRouter);
 
 app.get('/', (req, res) => {
     res.send({
