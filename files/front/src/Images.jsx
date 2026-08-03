@@ -44,6 +44,22 @@ export default function Images() {
     }
   };
 
+  const uploadImage = async ev => {
+    const file = ev.target.files[0];
+
+    const formData = new FormData();
+    formData.append('image', file);
+
+    const res = await fetch(`${API_URL}/images/upload`, {
+      method: "POST",
+      body: formData,
+    });
+
+    if (res.ok) {
+      getImages();
+    }
+  }
+
   return (
     <div className="gallery-page">
       <h1 className="gallery-title">הגלריה שלי</h1>
@@ -101,6 +117,9 @@ export default function Images() {
           </button>
         </div>
       )}
+
+      <br />
+      <input type="file" onChange={uploadImage} />
     </div>
   );
 }
