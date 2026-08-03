@@ -1,7 +1,7 @@
-npm init -y
-
 // ליצור קובץ ראשי
-index.js
+app.js
+
+npm init -y
 
 // כל ההתקנות ביחד
 npm install express cors mongoose moment morgan chalk joi jsonwebtoken bcrypt fs formidable --save
