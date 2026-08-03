@@ -9,4 +9,10 @@ router.get("/", (req, res) => {
     });
 });
 
+router.delete("/:imageName", (req, res) => {
+    fs.unlink(`./images/${req.params.imageName}`, err => {
+        res.end();
+    });
+});
+
 export default router;
