@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import "./Images.css";
+import { useRef } from "react";
 
 const API_URL = "http://localhost:3333";
 
@@ -7,6 +8,8 @@ export default function Images() {
   const [images, setImages] = useState([]);
   const [selected, setSelected] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isDrag, setIsDrag] = useState(false);
+  const fileInput = useRef(null);
 
   useEffect(() => {
     getImages();
@@ -60,8 +63,25 @@ export default function Images() {
     }
   }
 
+  const dragOver = ev => {
+    ev.preventDefault();
+    setIsDrag(true)
+  }
+
+  const dragLeave = ev => {
+    setIsDrag(false)
+  }
+
+  const drop = ev => {
+    setIsDrag(false)
+    ev.preventDefault();
+    console.log(ev.dataTransfer.items);
+
+    
+  }
+
   return (
-    <div className="gallery-page">
+    <div className={'gallery-page ' + (isDrag ? 'dragState' : '')} onDragOver={dragOver} onDragLeave={dragLeave} onDrop={drop}>
       <h1 className="gallery-title">הגלריה שלי</h1>
 
       {loading && <p className="gallery-status">טוען תמונות...</p>}
@@ -119,7 +139,9 @@ export default function Images() {
       )}
 
       <br />
-      <input type="file" onChange={uploadImage} />
+      <input type="file" ref={fileInput} onChange={uploadImage} />
+
+      <button className="btn-custom" onClick={() => fileInput.current.click()}>העלאת תמונה</button>
     </div>
   );
 }
