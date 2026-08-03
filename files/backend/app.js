@@ -10,6 +10,8 @@ app.use(cors({
     allowedHeaders: 'Content-Type, Accept, Authorization',
 }));
 
+app.use('/images', express.static('images'));
+
 app.get('/', (req, res) => {
     res.send({
         message: "Hello world!",
