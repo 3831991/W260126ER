@@ -1,7 +1,10 @@
 import { Router } from 'express';
+import { fileURLToPath } from 'url';
 import fs from 'fs';
+import path from 'path';
 import { formidable } from 'formidable';
 import { model, Schema } from 'mongoose';
+import { mimeToExt } from '../config.js';
 
 const schema = new Schema({
     createdTime: { type: Date, default: Date.now },
@@ -17,6 +20,12 @@ const File = model("files", schema);
 
 const router = Router();
 
+// שם הקובץ הנוכחי
+const __filename = fileURLToPath(import.meta.url);
+// שם התיקייה הנוכחית
+const __dirname = path.dirname(__filename);
+
+// קבלת תוכן של תיקייה
 router.get("/:folderId", async (req, res) => {
     const { folderId } = req.params;
     const parent = folderId === 'main' ? null : folderId;
@@ -25,6 +34,24 @@ router.get("/:folderId", async (req, res) => {
     res.send(files);
 });
 
+router.get('/file/:fileId/:fileName', async (req, res) => {
+    const { fileId } = req.params;
+    const file = await File.findById(fileId);
+
+    if (!file) {
+        return res.status(404).send({ message: "file not found" });
+    }
+
+    // ניתוב אבסולוטי לקובץ
+    const url = path.resolve(`${__dirname}/../files/${fileId}`);
+
+    res.setHeader("Content-Type", file.type);
+    res.setHeader("Content-Disposition", `inline; filename="${encodeURIComponent(file.fileName + '.' + mimeToExt[file.type])}"`);
+
+    res.sendFile(url);
+});
+
+// Create folder
 router.post("/folder/:folderId", async (req, res) => {
     const { folderId } = req.params;
     const { folderName } = req.query;
@@ -39,6 +66,7 @@ router.post("/folder/:folderId", async (req, res) => {
     res.send(newFolder);
 });
 
+// Upload filed
 router.post("/:folderId/upload", async (req, res) => {
     const { folderId } = req.params;
     const form = formidable();
@@ -48,9 +76,12 @@ router.post("/:folderId/upload", async (req, res) => {
     }
 
     form.parse(req, async (err, fields, fileList) => {
+        const name = f.originalFilename.split('.');
+        name.pop();
+
         for (const f of fileList.files) {
             const file = new File({
-                fileName: f.originalFilename,
+                fileName: name.join('.'),
                 isFolder: false,
                 size: f.size,
                 type: f.mimetype,
