@@ -124,7 +124,11 @@ export default function FilesManagers() {
 
         loader(true);
 
-        const res = await fetch(`http://localhost:5000/files/${fileClicked._id}/rename/${folderName}`, {
+        const params = new URLSearchParams({
+            folderName,
+        });
+
+        const res = await fetch(`http://localhost:5000/files/${fileClicked._id}/rename?${params}`, {
             method: 'PATCH',
         });
 

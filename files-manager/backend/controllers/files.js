@@ -40,6 +40,22 @@ router.post("/folder/:folderId", async (req, res) => {
     res.send(newFolder);
 });
 
+router.patch("/:fileId/rename", async (req, res) => {
+    const { fileId } = req.params;
+    const { folderName } = req.query;
+
+    const file = await File.findById(fileId);
+
+    if (!file) {
+        return res.status(403).send({ message: "file not found" });
+    }
+
+    file.fileName = folderName;
+    file.save();
+
+    res.end();
+});
+
 router.delete("/:fileId", async (req, res) => {
     const { fileId } = req.params;
 
