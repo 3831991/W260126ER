@@ -2,7 +2,6 @@ import { Router } from 'express';
 import fs from 'fs';
 import { formidable } from 'formidable';
 import { model, Schema } from 'mongoose';
-import { type } from 'os';
 
 const schema = new Schema({
     createdTime: { type: Date, default: Date.now },
@@ -38,6 +37,37 @@ router.post("/folder/:folderId", async (req, res) => {
 
     const newFolder = await folder.save();
     res.send(newFolder);
+});
+
+router.post("/:folderId/upload", async (req, res) => {
+    const { folderId } = req.params;
+    const form = formidable();
+
+    if (!fs.existsSync('./files')) {
+        fs.mkdirSync('./files', { recursive: true });
+    }
+
+    form.parse(req, async (err, fields, fileList) => {
+        for (const f of fileList.files) {
+            const file = new File({
+                fileName: f.originalFilename,
+                isFolder: false,
+                size: f.size,
+                type: f.mimetype,
+                parent: folderId === 'main' ? null : folderId,
+            });
+
+            const fileSaved = await file.save();
+
+            fs.copyFile(f.filepath, `./files/${fileSaved._id}`, err => {
+                if (err) {
+                    console.log(err);
+                }
+            });
+        }
+
+        res.end();
+    });
 });
 
 router.patch("/:fileId/rename", async (req, res) => {
