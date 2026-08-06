@@ -76,10 +76,10 @@ router.post("/:folderId/upload", async (req, res) => {
     }
 
     form.parse(req, async (err, fields, fileList) => {
-        const name = f.originalFilename.split('.');
-        name.pop();
-
         for (const f of fileList.files) {
+            const name = f.originalFilename.split('.');
+            name.pop();
+
             const file = new File({
                 fileName: name.join('.'),
                 isFolder: false,
