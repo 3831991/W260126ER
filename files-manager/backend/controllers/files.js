@@ -28,6 +28,7 @@ const __dirname = path.dirname(__filename);
 // קבלת כל הקבצים והתיקיות
 router.get("/all", async (req, res) => {
     const files = await File.find({ isDeleted: false });
+
     res.send({
         files
     });
@@ -36,6 +37,7 @@ router.get("/all", async (req, res) => {
 // קבלת סל המחזור
 router.get("/recycle-bin", async (req, res) => {
     const files = await File.find({ isDeleted: true });
+
     res.send({
         files
     });
@@ -61,7 +63,8 @@ router.get("/:folderId", async (req, res) => {
 
 router.get('/file/:fileId/:fileName', async (req, res) => {
     const { fileId } = req.params;
-    const file = await File.findById(fileId);
+    // מקבלים את הקובץ רק אם מזהה נמצא והקובץ לא נמחק
+    const file = await File.findOne({ _id: fileId, isDeleted: false });
 
     if (!file) {
         return res.status(404).send({ message: "file not found" });
@@ -137,6 +140,21 @@ router.patch("/:fileId/rename", async (req, res) => {
     }
 
     file.fileName = folderName;
+    file.save();
+
+    res.end();
+});
+
+router.patch("/:fileId/restore", async (req, res) => {
+    const { fileId } = req.params;
+
+    const file = await File.findById(fileId);
+
+    if (!file) {
+        return res.status(403).send({ message: "file not found" });
+    }
+
+    file.isDeleted = false;
     file.save();
 
     res.end();

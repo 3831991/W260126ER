@@ -199,6 +199,21 @@ export default function FilesManagers() {
         loader(false);
     }
 
+    const restore = async () => {
+        loader(true);
+
+        const res = await fetch(`http://localhost:5000/files/${fileClicked._id}/restore`, {
+            method: 'PATCH',
+        });
+
+        if (res.ok) {
+            setFiles(prev => prev.filter(x => x._id != fileClicked._id));
+            snackbar("הקובץ שוחזר בהצלחה");
+        }
+
+        loader(false);
+    }
+
     const rightClick = (ev, file) => {
         ev.preventDefault();
         setFileClicked(file);
@@ -375,7 +390,8 @@ export default function FilesManagers() {
 
             <div className="context-menu" ref={menu} style={{ display: isMenu ? 'block' : 'none' }}>
                 {selectedAmount <= 1 && <a href="#" className="menu-item" onClick={rename}><i className='fa fa-edit'></i> שינוי שם</a>}
-                <a href="#" className="menu-item" onClick={remove}><i className='fa fa-trash'></i> מחיקה</a>
+                { !fileClicked?.isDeleted && <a href="#" className="menu-item" onClick={remove}><i className='fa fa-trash'></i> מחיקה</a> }
+                { fileClicked?.isDeleted && <a href="#" className="menu-item" onClick={restore}><i className='fa fa-history'></i> שחזור</a> }
             </div>
 
             <input type="file" onChange={upload} ref={fileInput} multiple style={{ display: 'none' }} />
