@@ -25,13 +25,38 @@ const __filename = fileURLToPath(import.meta.url);
 // שם התיקייה הנוכחית
 const __dirname = path.dirname(__filename);
 
+// קבלת כל הקבצים והתיקיות
+router.get("/all", async (req, res) => {
+    const files = await File.find({ isDeleted: false });
+    res.send({
+        files
+    });
+});
+
+// קבלת סל המחזור
+router.get("/recycle-bin", async (req, res) => {
+    const files = await File.find({ isDeleted: true });
+    res.send({
+        files
+    });
+});
+
 // קבלת תוכן של תיקייה
 router.get("/:folderId", async (req, res) => {
     const { folderId } = req.params;
     const parent = folderId === 'main' ? null : folderId;
+    let folder;
+
+    if (parent) {
+        folder = await File.findOne({ _id: parent, isDeleted: false });
+    }
 
     const files = await File.find({ parent, isDeleted: false });
-    res.send(files);
+
+    res.send({
+        folder,
+        files
+    });
 });
 
 router.get('/file/:fileId/:fileName', async (req, res) => {

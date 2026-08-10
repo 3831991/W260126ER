@@ -4,6 +4,8 @@ import { icons } from "../config";
 import { MyContext } from "../App";
 
 export default function FilesManagers() {
+    const [title, setTitle] = useState('ניהול קבצים');
+    const [folder, setFolder] = useState();
     const [files, setFiles] = useState([]);
     const [fileClicked, setFileClicked] = useState();
     const [selecteds, setSelecteds] = useState({});
@@ -24,7 +26,9 @@ export default function FilesManagers() {
 
         if (res.ok) {
             const data = await res.json();
-            setFiles(data);
+            setFiles(data.files);
+            setFolder(data.folder);
+            setTitle("ניהול קבצים");
         }
 
         loader(false);
@@ -111,8 +115,14 @@ export default function FilesManagers() {
     }
 
     const home = () => {
+        // אם אני כבר בדף הבית, אך מציג את הכל או בסל המחזור
+        if (!folderId) {
+            getData();
+        } else {
+            navigate('/');
+        }
+
         cancelSelected();
-        navigate('/');
     }
 
     const rename = async () => {
@@ -285,18 +295,53 @@ export default function FilesManagers() {
         setSelectedAmount(0);
     }
 
+    const showAll = async () => {
+        loader(true);
+
+        const res = await fetch(`http://localhost:5000/files/all`);
+
+        if (res.ok) {
+            const data = await res.json();
+            setFiles(data.files);
+            setFolder(null);
+            setTitle("כל הקבצים");
+        }
+
+        loader(false);
+    }
+
+    const getRecycleBin = async () => {
+        loader(true);
+
+        const res = await fetch(`http://localhost:5000/files/recycle-bin`);
+
+        if (res.ok) {
+            const data = await res.json();
+            setFiles(data.files);
+            setFolder(null);
+            setTitle("סל מחזור");
+        }
+
+        loader(false);
+    }
+
     return (
         <div>
-            <h1>ניהול קבצים</h1>
+            <h1>
+                {title}
+                { folder && <span> - {folder.fileName}</span> }
+            </h1>
 
             <div className="actions">
                 <div>
                     {folderId && <button className='button' onClick={back}><i className='fa fa-arrow-right'></i> אחורה</button>}
-                    {folderId && <button className='button' onClick={home}><i className='fa fa-home'></i> ראשי</button>}
+                    {(folderId || folder === null) && <button className='button' onClick={home}><i className='fa fa-home'></i> ראשי</button>}
                 </div>
                 <div>
                     <button className='button' onClick={createFolder}><i className='fa fa-plus'></i> תיקייה חדשה</button>
                     <button className='button' onClick={() => fileInput.current.click()}><i className='fa fa-upload'></i> העלאת קבצים</button>
+                    <button className='button' title="הצג הכל" onClick={showAll}><i className='fa fa-list'></i></button>
+                    <button className='button' title="סל מחזור" onClick={getRecycleBin}><i className='fa fa-trash'></i></button>
                 </div>
             </div>
 
