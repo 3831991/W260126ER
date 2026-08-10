@@ -94,7 +94,7 @@ router.post("/folder/:folderId", async (req, res) => {
     res.send(newFolder);
 });
 
-// Upload filed
+// Upload files
 router.post("/:folderId/upload", async (req, res) => {
     const { folderId } = req.params;
     const form = formidable();
