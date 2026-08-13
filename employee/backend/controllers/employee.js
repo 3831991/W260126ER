@@ -89,7 +89,7 @@ router.post("/", async (req, res) => {
                 house: item.address.house,
             },
             profile: {
-                fileName: file.fileName,
+                fileName: file.originalFilename,
                 size: file.size,
                 type: file.mimetype,
             },
@@ -138,7 +138,7 @@ router.put("/:id", async (req, res) => {
         if (files.profile) {
             const file = files.profile[0];
 
-            employee.profile.fileName   = file.fileName;
+            employee.profile.fileName   = file.originalFilename;
             employee.profile.size       = file.size;
             employee.profile.type       = file.mimetype;
 
