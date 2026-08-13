@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import EmployeeForm from "./EmployeeForm";
 import "./Employees.css";
 
 const API_URL = "http://localhost:4000";
@@ -11,9 +12,38 @@ const formatDate = date => {
     return new Date(date).toLocaleDateString("he-IL");
 };
 
+const isImageProfile = profile =>
+    Boolean(profile?.fileName) && (!profile.type || profile.type.startsWith("image/"));
+
+function EmployeeAvatar({ employee }) {
+    const [imgError, setImgError] = useState(false);
+    const showImage = !imgError && isImageProfile(employee.profile);
+
+    if (showImage) {
+        return (
+            <img
+                className="employee-avatar employee-avatar-img"
+                src={`${API_URL}/employees/${employee._id}/profile/${employee.profile.fileName}`}
+                alt={`${employee.firstName} ${employee.lastName}`}
+                onError={() => setImgError(true)}
+            />
+        );
+    }
+
+    return (
+        <div className="employee-avatar">
+            {employee.firstName?.[0]}
+            {employee.lastName?.[0]}
+        </div>
+    );
+}
+
 export default function Employees() {
     const [employees, setEmployees] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [isFormOpen, setIsFormOpen] = useState(false);
+    const [editingEmployee, setEditingEmployee] = useState(null);
+    const [saving, setSaving] = useState(false);
 
     const getEmployees = async () => {
         setLoading(true);
@@ -31,9 +61,68 @@ export default function Employees() {
         getEmployees();
     }, []);
 
+    const handleAddClick = () => {
+        setEditingEmployee(null);
+        setIsFormOpen(true);
+    };
+
+    const handleEditClick = employee => {
+        setEditingEmployee(employee);
+        setIsFormOpen(true);
+    };
+
+    const handleFormCancel = () => {
+        setIsFormOpen(false);
+        setEditingEmployee(null);
+    };
+
+    const handleFormSubmit = async formData => {
+        setSaving(true);
+
+        const url = editingEmployee
+            ? `${API_URL}/employees/${editingEmployee._id}`
+            : `${API_URL}/employees`;
+
+        const res = await fetch(url, {
+            method: editingEmployee ? "PUT" : "POST",
+            body: formData,
+        });
+
+        setSaving(false);
+
+        if (res.ok) {
+            setIsFormOpen(false);
+            setEditingEmployee(null);
+            getEmployees();
+        }
+    };
+
+    const handleDeleteClick = async employee => {
+        const confirmed = window.confirm(
+            `למחוק את ${employee.firstName} ${employee.lastName}?`
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+        const res = await fetch(`${API_URL}/employees/${employee._id}`, {
+            method: "DELETE",
+        });
+
+        if (res.ok) {
+            getEmployees();
+        }
+    };
+
     return (
         <div className="employees-page">
-            <h1 className="employees-title">ניהול עובדים</h1>
+            <div className="employees-header">
+                <h1 className="employees-title">ניהול עובדים</h1>
+                <button className="employee-btn employee-btn-primary" onClick={handleAddClick}>
+                    + הוספת עובד
+                </button>
+            </div>
 
             {loading && <p className="employees-status">טוען עובדים...</p>}
             {!loading && employees.length === 0 && (
@@ -43,10 +132,26 @@ export default function Employees() {
             <div className="employees-grid">
                 {employees.map(emp => (
                     <div className="employee-card" key={emp._id}>
-                        <div className="employee-avatar">
-                            {emp.firstName?.[0]}
-                            {emp.lastName?.[0]}
+                        <div className="employee-card-actions">
+                            <button
+                                type="button"
+                                className="employee-icon-btn employee-icon-btn-edit"
+                                title="עריכה"
+                                onClick={() => handleEditClick(emp)}
+                            >
+                                ✏️
+                            </button>
+                            <button
+                                type="button"
+                                className="employee-icon-btn employee-icon-btn-delete"
+                                title="מחיקה"
+                                onClick={() => handleDeleteClick(emp)}
+                            >
+                                🗑️
+                            </button>
                         </div>
+
+                        <EmployeeAvatar employee={emp} />
 
                         <h2 className="employee-name">
                             {emp.firstName} {emp.lastName}
@@ -97,6 +202,15 @@ export default function Employees() {
                     </div>
                 ))}
             </div>
+
+            {isFormOpen && (
+                <EmployeeForm
+                    employee={editingEmployee}
+                    onSubmit={handleFormSubmit}
+                    onCancel={handleFormCancel}
+                    saving={saving}
+                />
+            )}
         </div>
     );
 }
