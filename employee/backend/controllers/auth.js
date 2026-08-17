@@ -62,6 +62,17 @@ router.post("/signup", async (req, res) => {
     res.send(newUser);
 });
 
+router.get("/renew-token", guard, async (req, res) => {
+    const data = jwt.decode(req.headers.authorization);
 
+    const obj = {
+        userId: data.userId,
+        fullName: data.fullName,
+    }
+
+    const token = jwt.sign(obj, JWT_SECRET, { expiresIn: '20m' });
+
+    res.send(token); 
+});
 
 export default router;
