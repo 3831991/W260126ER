@@ -4,6 +4,7 @@ import { model, Schema } from "mongoose";
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import path from 'path';
+import guard from '../services/guard.js';
 
 // שם הקובץ הנוכחי
 const __filename = fileURLToPath(import.meta.url);
@@ -42,13 +43,13 @@ const Employee = model("employees", EmployeeSchema);
 
 const router = Router();
 
-router.get("/", async (req, res) => {
+router.get("/", guard, async (req, res) => {
     const data = await Employee.find();
 
     res.send(data);
 });
 
-router.get('/:employeeId/profile/:fileName', async (req, res) => {
+router.get('/:employeeId/profile/:fileName', guard, async (req, res) => {
     const { employeeId } = req.params;
     const employee = await Employee.findById(employeeId);
 
@@ -69,7 +70,7 @@ router.get('/:employeeId/profile/:fileName', async (req, res) => {
     res.sendFile(url);
 });
 
-router.post("/", async (req, res) => {
+router.post("/", guard, async (req, res) => {
     const form = formidable();
 
     form.parse(req, async (err, fields, files) => {
@@ -112,7 +113,7 @@ router.post("/", async (req, res) => {
     });
 });
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", guard, async (req, res) => {
     const { id } = req.params;
     const form = formidable();
 
@@ -160,7 +161,7 @@ router.put("/:id", async (req, res) => {
     });
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", guard, async (req, res) => {
     await Employee.findByIdAndDelete(req.params.id);
     res.end();
 });

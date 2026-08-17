@@ -1,8 +1,17 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/useAuth";
 import EmployeeForm from "./EmployeeForm";
 import "./Employees.css";
 
 const API_URL = "http://localhost:4000";
+const TOKEN = localStorage.getItem("token");
+
+function authHeaders() {
+    return {
+        Authorization: localStorage.getItem("token"),
+    };
+}
 
 const formatDate = date => {
     if (!date) {
@@ -23,7 +32,7 @@ function EmployeeAvatar({ employee }) {
         return (
             <img
                 className="employee-avatar employee-avatar-img"
-                src={`${API_URL}/employees/${employee._id}/profile/${employee.profile.fileName}`}
+                src={`${API_URL}/employees/${employee._id}/profile/${employee.profile.fileName}?token=${TOKEN}`}
                 alt={`${employee.firstName} ${employee.lastName}`}
                 onError={() => setImgError(true)}
             />
@@ -45,10 +54,20 @@ export default function Employees() {
     const [editingEmployee, setEditingEmployee] = useState(null);
     const [saving, setSaving] = useState(false);
 
+    const { logout, user } = useAuth();
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        logout();
+        navigate("/login", { replace: true });
+    };
+
     const getEmployees = async () => {
         setLoading(true);
 
-        const res = await fetch(`${API_URL}/employees`);
+        const res = await fetch(`${API_URL}/employees`, {
+            headers: authHeaders(),
+        });
 
         if (res.ok) {
             setEmployees(await res.json());
@@ -85,6 +104,7 @@ export default function Employees() {
 
         const res = await fetch(url, {
             method: editingEmployee ? "PUT" : "POST",
+            headers: authHeaders(),
             body: formData,
         });
 
@@ -108,6 +128,7 @@ export default function Employees() {
 
         const res = await fetch(`${API_URL}/employees/${employee._id}`, {
             method: "DELETE",
+            headers: authHeaders(),
         });
 
         if (res.ok) {
@@ -122,6 +143,12 @@ export default function Employees() {
                 <button className="employee-btn employee-btn-primary" onClick={handleAddClick}>
                     + הוספת עובד
                 </button>
+                <div className="employees-user">
+                    <span>שלום {user?.firstName || 'אורח'}</span>
+                    <button className="employee-btn employee-btn-secondary" onClick={handleLogout}>
+                        התנתקות
+                    </button>
+                </div>
             </div>
 
             {loading && <p className="employees-status">טוען עובדים...</p>}

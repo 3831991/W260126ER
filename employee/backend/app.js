@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
-// import AuthRouter from './controllers/auth.js'
+import AuthRouter from './controllers/auth.js'
 import EmployeesRouter from './controllers/employee.js';
 
 await mongoose.connect('mongodb://127.0.0.1:27017/full-stack-W260126ER');
@@ -18,7 +18,7 @@ app.use(cors({
     allowedHeaders: 'Content-Type, Accept, Authorization',
 }));
 
-// app.use("/", AuthRouter);
+app.use("/", AuthRouter);
 app.use("/employees", EmployeesRouter);
 
 app.get("/", (req, res) => {
