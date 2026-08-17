@@ -84,11 +84,14 @@ export default function EmployeeForm({ employee, onSubmit, onCancel, saving }) {
                 <h2 className="employee-form-title">
                     {isEdit ? "עריכת עובד" : "הוספת עובד חדש"}
                 </h2>
+                <p className="employee-form-hint">
+                    <span className="required-mark">*</span> שדה חובה
+                </p>
 
                 <form onSubmit={handleSubmit}>
                     <div className="employee-form-grid">
                         <label className="employee-form-field">
-                            <span>שם פרטי</span>
+                            <span>שם פרטי <span className="required-mark">*</span></span>
                             <input
                                 name="firstName"
                                 value={form.firstName}
@@ -98,7 +101,7 @@ export default function EmployeeForm({ employee, onSubmit, onCancel, saving }) {
                         </label>
 
                         <label className="employee-form-field">
-                            <span>שם משפחה</span>
+                            <span>שם משפחה <span className="required-mark">*</span></span>
                             <input
                                 name="lastName"
                                 value={form.lastName}
@@ -108,73 +111,84 @@ export default function EmployeeForm({ employee, onSubmit, onCancel, saving }) {
                         </label>
 
                         <label className="employee-form-field">
-                            <span>תעודת זהות</span>
+                            <span>תעודת זהות <span className="required-mark">*</span></span>
                             <input
                                 name="passportId"
                                 value={form.passportId}
                                 onChange={handleChange}
+                                required
                             />
                         </label>
 
                         <label className="employee-form-field">
-                            <span>טלפון</span>
+                            <span>טלפון <span className="required-mark">*</span></span>
                             <input
                                 name="phone"
                                 value={form.phone}
                                 onChange={handleChange}
+                                required
                             />
                         </label>
 
                         <label className="employee-form-field">
-                            <span>אימייל</span>
+                            <span>אימייל <span className="required-mark">*</span></span>
                             <input
                                 type="email"
                                 name="email"
                                 value={form.email}
                                 onChange={handleChange}
+                                required
                             />
                         </label>
 
                         <label className="employee-form-field">
-                            <span>תאריך לידה</span>
+                            <span>תאריך לידה <span className="required-mark">*</span></span>
                             <input
                                 type="date"
                                 name="birthDate"
                                 value={form.birthDate}
                                 onChange={handleChange}
+                                required
                             />
                         </label>
 
                         <label className="employee-form-field">
-                            <span>עיר</span>
+                            <span>עיר <span className="required-mark">*</span></span>
                             <input
                                 name="city"
                                 value={form.city}
                                 onChange={handleChange}
+                                required
                             />
                         </label>
 
                         <label className="employee-form-field">
-                            <span>רחוב</span>
+                            <span>רחוב <span className="required-mark">*</span></span>
                             <input
                                 name="street"
                                 value={form.street}
                                 onChange={handleChange}
+                                required
                             />
                         </label>
 
                         <label className="employee-form-field">
-                            <span>מספר בית</span>
+                            <span>מספר בית <span className="required-mark">*</span></span>
                             <input
                                 name="house"
                                 value={form.house}
                                 onChange={handleChange}
+                                required
                             />
                         </label>
 
                         <label className="employee-form-field employee-form-file">
-                            <span>קובץ פרופיל</span>
-                            <input type="file" onChange={handleFileChange} />
+                            <span>קובץ פרופיל <span className="required-mark">*</span></span>
+                            <input
+                                type="file"
+                                onChange={handleFileChange}
+                                required={!isEdit && !form.profileFile}
+                            />
                             {(form.profileFile?.name || form.existingFileName) && (
                                 <small>{form.profileFile?.name || form.existingFileName}</small>
                             )}

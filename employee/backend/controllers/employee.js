@@ -5,6 +5,7 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import guard from '../services/guard.js';
+import validate from './employee.validation.js';
 
 // שם הקובץ הנוכחי
 const __filename = fileURLToPath(import.meta.url);
@@ -70,7 +71,7 @@ router.get('/:employeeId/profile/:fileName', guard, async (req, res) => {
     res.sendFile(url);
 });
 
-router.post("/", guard, async (req, res) => {
+router.post("/", guard, validate, async (req, res) => {
     const form = formidable();
 
     form.parse(req, async (err, fields, files) => {
@@ -113,7 +114,7 @@ router.post("/", guard, async (req, res) => {
     });
 });
 
-router.put("/:id", guard, async (req, res) => {
+router.put("/:id", guard, validate, async (req, res) => {
     const { id } = req.params;
     const form = formidable();
 
