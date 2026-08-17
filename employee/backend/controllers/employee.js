@@ -1,11 +1,11 @@
 import { Router } from "express";
-import formidable from "formidable";
 import { model, Schema } from "mongoose";
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import guard from '../services/guard.js';
 import validate from './employee.validation.js';
+import { getCurrentUser } from "../services/utilities.js";
 
 // שם הקובץ הנוכחי
 const __filename = fileURLToPath(import.meta.url);
@@ -72,51 +72,51 @@ router.get('/:employeeId/profile/:fileName', guard, async (req, res) => {
 });
 
 router.post("/", guard, validate, async (req, res) => {
-    const form = formidable();
+    const user = getCurrentUser(req);
+    const item = JSON.parse(req.fields.data);
+    const file = req.files.profile?.[0];
 
-    form.parse(req, async (err, fields, files) => {
-        const item = JSON.parse(fields.data);
-        const file = files.profile[0];
+    const employee = new Employee({
+        firstName: item.firstName,
+        lastName: item.lastName,
+        passportId: item.passportId,
+        phone: item.phone,
+        email: item.email,
+        birthDate: item.birthDate,
+        address: {
+            city: item.address.city,
+            street: item.address.street,
+            house: item.address.house,
+        },
+        profile: {
+            fileName: file?.originalFilename,
+            size: file?.size,
+            type: file?.mimetype,
+        },
+        userCreatedId: user.userId,
+    });
 
-        const employee = new Employee({
-            firstName: item.firstName,
-            lastName: item.lastName,
-            passportId: item.passportId,
-            phone: item.phone,
-            email: item.email,
-            birthDate: item.birthDate,
-            address: {
-                city: item.address.city,
-                street: item.address.street,
-                house: item.address.house,
-            },
-            profile: {
-                fileName: file.originalFilename,
-                size: file.size,
-                type: file.mimetype,
-            },
-            // userCreatedId
-        });
+    const newEmployee = await employee.save();
 
-        const newEmployee = await employee.save();
+    if (!file) {
+        return res.send(newEmployee);
+    }
 
-        if (!fs.existsSync('./profiles')) {
-            fs.mkdirSync('./profiles', { recursive: true });
+    if (!fs.existsSync('./profiles')) {
+        fs.mkdirSync('./profiles', { recursive: true });
+    }
+
+    fs.copyFile(file.filepath, `./profiles/${newEmployee._id}`, err => {
+        if (err) {
+            console.log(err);
         }
 
-        fs.copyFile(file.filepath, `./profiles/${newEmployee._id}`, err => {
-            if (err) {
-                console.log(err);
-            }
-
-            res.send(newEmployee);
-        });
+        res.send(newEmployee);
     });
 });
 
 router.put("/:id", guard, validate, async (req, res) => {
     const { id } = req.params;
-    const form = formidable();
 
     const employee = await Employee.findById(id);
 
@@ -124,42 +124,40 @@ router.put("/:id", guard, validate, async (req, res) => {
         return res.status(404).send({ message: "Employee not found" });
     }
 
-    form.parse(req, async (err, fields, files) => {
-        const item = JSON.parse(fields.data);
-        
-        employee.firstName  = item.firstName;
-        employee.lastName   = item.lastName;
-        employee.passportId = item.passportId;
-        employee.phone      = item.phone;
-        employee.email      = item.email;
-        employee.birthDate  = item.birthDate;
-        employee.address.city   = item.address.city;
-        employee.address.street = item.address.street;
-        employee.address.house  = item.address.house;
+    const item = JSON.parse(req.fields.data);
 
-        if (files.profile) {
-            const file = files.profile[0];
+    employee.firstName  = item.firstName;
+    employee.lastName   = item.lastName;
+    employee.passportId = item.passportId;
+    employee.phone      = item.phone;
+    employee.email      = item.email;
+    employee.birthDate  = item.birthDate;
+    employee.address.city   = item.address.city;
+    employee.address.street = item.address.street;
+    employee.address.house  = item.address.house;
 
-            employee.profile.fileName   = file.originalFilename;
-            employee.profile.size       = file.size;
-            employee.profile.type       = file.mimetype;
+    if (req.files.profile) {
+        const file = req.files.profile[0];
 
-            if (!fs.existsSync('./profiles')) {
-                fs.mkdirSync('./profiles', { recursive: true });
-            }
+        employee.profile.fileName   = file.originalFilename;
+        employee.profile.size       = file.size;
+        employee.profile.type       = file.mimetype;
 
-            fs.copyFile(file.filepath, `./profiles/${employee._id}`, err => {
-                if (err) {
-                    console.log(err);
-                }
-
-                res.end();
-            });
+        if (!fs.existsSync('./profiles')) {
+            fs.mkdirSync('./profiles', { recursive: true });
         }
 
-        await employee.save();
-        res.end();
-    });
+        fs.copyFile(file.filepath, `./profiles/${employee._id}`, err => {
+            if (err) {
+                console.log(err);
+            }
+
+            res.end();
+        });
+    }
+
+    await employee.save();
+    res.end();
 });
 
 router.delete("/:id", guard, async (req, res) => {

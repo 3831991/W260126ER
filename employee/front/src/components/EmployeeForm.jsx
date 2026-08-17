@@ -183,11 +183,10 @@ export default function EmployeeForm({ employee, onSubmit, onCancel, saving }) {
                         </label>
 
                         <label className="employee-form-field employee-form-file">
-                            <span>קובץ פרופיל <span className="required-mark">*</span></span>
+                            <span>קובץ פרופיל</span>
                             <input
                                 type="file"
                                 onChange={handleFileChange}
-                                required={!isEdit && !form.profileFile}
                             />
                             {(form.profileFile?.name || form.existingFileName) && (
                                 <small>{form.profileFile?.name || form.existingFileName}</small>

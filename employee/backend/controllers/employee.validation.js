@@ -29,6 +29,9 @@ export default (req, res, next) => {
             });
         }
 
+        req.fields = fields;
+        req.files = files;
+
         next();
     });
 }
