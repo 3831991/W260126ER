@@ -3,6 +3,7 @@ import { Router } from 'express';
 import bcrypt from "bcrypt";
 import jwt from 'jsonwebtoken';
 import { JWT_SECRET } from "../config.js";
+import guard from '../services/guard.js';
 
 const schema = new Schema({
     firstName: String,
