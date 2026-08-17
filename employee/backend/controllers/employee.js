@@ -45,14 +45,16 @@ const Employee = model("employees", EmployeeSchema);
 const router = Router();
 
 router.get("/", guard, async (req, res) => {
-    const data = await Employee.find();
+    const user = getCurrentUser(req);
+    const data = await Employee.find({ userCreatedId: user.userId });
 
     res.send(data);
 });
 
 router.get('/:employeeId/profile/:fileName', guard, async (req, res) => {
     const { employeeId } = req.params;
-    const employee = await Employee.findById(employeeId);
+    const user = getCurrentUser(req);
+    const employee = await Employee.findOne({ _id: employeeId, userCreatedId: user.userId });
 
     if (!employee) {
         return res.status(404).send({ message: "Employee not found" });
@@ -117,8 +119,9 @@ router.post("/", guard, validate, async (req, res) => {
 
 router.put("/:id", guard, validate, async (req, res) => {
     const { id } = req.params;
+    const user = getCurrentUser(req);
 
-    const employee = await Employee.findById(id);
+    const employee = await Employee.findOne({ _id: employeeId, userCreatedId: user.userId });
 
     if (!employee) {
         return res.status(404).send({ message: "Employee not found" });
@@ -161,7 +164,8 @@ router.put("/:id", guard, validate, async (req, res) => {
 });
 
 router.delete("/:id", guard, async (req, res) => {
-    await Employee.findByIdAndDelete(req.params.id);
+    const user = getCurrentUser(req);
+    await Employee.deleteOne({ _id: employeeId, userCreatedId: user.userId });
     res.end();
 });
 
