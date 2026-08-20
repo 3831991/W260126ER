@@ -55,3 +55,18 @@ function autoMove() {
 
 createBoard();
 showSnake();
+
+
+
+window.addEventListener("keydown", ev => {
+    ev.preventDefault();
+
+    switch(ev.key) {
+        case 'ArrowLeft'    : move('left');             break;
+        case 'ArrowRight'   : move('right');            break;
+        case 'ArrowUp'      : move('up');               break;
+        case 'ArrowDown'    : move('down');             break;
+        case 'p' :
+        case 'Escape'       : clearInterval(interval);  break;
+    }
+});
