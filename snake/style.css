@@ -17,3 +17,11 @@ body {
 .active {
     background-color: #d49800;
 }
+
+.bait::after {
+    content: '🥝';
+    font-size: 12px;
+    position: relative;
+    top: -5px;
+    right: -3px;
+}
