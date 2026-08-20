@@ -13,3 +13,7 @@ body {
     height: 10px;
     width: 10px;
 }
+
+.active {
+    background-color: #d49800;
+}
