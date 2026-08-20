@@ -102,6 +102,7 @@ function gameOver() {
     isGameOver = true;
     clearInterval(interval);
     alert("נפסלת");
+    location.reload();
 }
 
 function setBait() {

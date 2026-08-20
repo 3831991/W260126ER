@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#071510">
+    <title>Neon Snake</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800&family=Rubik:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <main class="game-shell">
+        <header class="topbar">
+            <div class="brand">
+                <span class="brand-mark" aria-hidden="true"></span>
+                <div>
+                    <p class="eyebrow">ARCADE EDITION</p>
+                    <h1>NEON SNAKE</h1>
+                </div>
+            </div>
+            <div class="stats" aria-label="נתוני משחק">
+                <div class="stat"><span>ניקוד</span><strong id="score">000</strong></div>
+                <div class="stat"><span>שיא</span><strong id="high-score">000</strong></div>
+            </div>
+        </header>
+
+        <section class="game-card">
+            <div class="board-wrap">
+                <div class="board" role="application" aria-label="משחק סנייק"></div>
+                <div class="game-overlay is-visible" id="game-overlay">
+                    <div class="overlay-icon" aria-hidden="true">S</div>
+                    <p class="overlay-kicker" id="overlay-kicker">מוכנים לזוז?</p>
+                    <h2 id="overlay-title">הנחש מחכה לך</h2>
+                    <p id="overlay-copy">אספו את התפוחים, צברו נקודות ואל תיגעו בקירות.</p>
+                    <button class="primary-button" id="start-button" type="button">
+                        <span id="button-label">התחלת משחק</span><span aria-hidden="true">←</span>
+                    </button>
+                    <span class="keyboard-hint">אפשר להתחיל גם עם מקשי החצים</span>
+                </div>
+            </div>
+            <footer class="game-footer">
+                <div class="status"><span class="status-dot"></span><span id="status-text">ממתין להתחלה</span></div>
+                <p><kbd>ESC</kbd> השהיה <span class="separator">•</span> חצים לתנועה</p>
+            </footer>
+        </section>
+
+        <nav class="mobile-controls" aria-label="בקרי משחק">
+            <button class="control up" type="button" data-direction="up" aria-label="למעלה">↑</button>
+            <button class="control left" type="button" data-direction="left" aria-label="שמאלה">←</button>
+            <button class="control down" type="button" data-direction="down" aria-label="למטה">↓</button>
+            <button class="control right" type="button" data-direction="right" aria-label="ימינה">→</button>
+        </nav>
+    </main>
+</body>
+</html>
