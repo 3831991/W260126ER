@@ -2,6 +2,7 @@ const height = 30;
 const width = 30;
 const speed = 150;
 const length = 8;
+let bait;
 let interval;
 let isGameOver = false;
 let direction = "left";
@@ -38,12 +39,20 @@ function move(dir) {
         }
 
         head++;
+
+        if (head % width === 0) {
+            return gameOver();
+        }
     } else if (dir === "right") {
         if (direction === "left") {
             return;
         }
 
         head--;
+
+        if ((head + 1) % width === 0) {
+            return gameOver();
+        }
     } else if (dir === "up") {
         if (direction === "down") {
             return;
@@ -73,9 +82,14 @@ function move(dir) {
     direction = dir;
 
     snake.unshift(head);
-    snake.pop();
-    showSnake();
 
+    if (head === bait) {
+        setBait();
+    } else {
+        snake.pop();
+    }
+
+    showSnake();
     autoMove();
 }
 
@@ -90,10 +104,20 @@ function gameOver() {
     alert("נפסלת");
 }
 
+function setBait() {
+    board.children[bait]?.classList.remove("bait");
+    bait = Math.floor(Math.random() * width * height);
+
+    if (snake.includes(bait)) {
+        setBait();
+    } else {
+        board.children[bait].classList.add("bait");
+    }
+}
+
 createBoard();
 showSnake();
-
-
+setBait();
 
 window.addEventListener("keydown", ev => {
     ev.preventDefault();
