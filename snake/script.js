@@ -3,6 +3,7 @@ const width = 30;
 const speed = 150;
 const length = 8;
 let interval;
+let isGameOver = false;
 let direction = "left";
 const snake = new Array(length).fill().map((x, i) => i);
 snake.reverse();
@@ -27,16 +28,46 @@ function showSnake() {
 }
 
 function move(dir) {
+    if (isGameOver) return;
+
     head = snake[0];
 
     if (dir === "left") {
+        if (direction === "right") {
+            return;
+        }
+
         head++;
     } else if (dir === "right") {
+        if (direction === "left") {
+            return;
+        }
+
         head--;
     } else if (dir === "up") {
+        if (direction === "down") {
+            return;
+        }
+
         head -= width;
+
+        if (head < 0) {
+            return gameOver();
+        }
     } else if (dir === "down") {
+        if (direction === "up") {
+            return;
+        }
+
         head += width;
+
+        if (head >= width * height) {
+            return gameOver();
+        }
+    }
+
+    if (snake.includes(head)) {
+        return gameOver();
     }
 
     direction = dir;
@@ -51,6 +82,12 @@ function move(dir) {
 function autoMove() {
     clearInterval(interval);
     interval = setInterval(() => move(direction), speed);
+}
+
+function gameOver() {
+    isGameOver = true;
+    clearInterval(interval);
+    alert("נפסלת");
 }
 
 createBoard();
