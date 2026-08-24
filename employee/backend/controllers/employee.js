@@ -117,8 +117,8 @@ router.post("/", guard, validate, async (req, res) => {
     });
 });
 
-router.put("/:id", guard, validate, async (req, res) => {
-    const { id } = req.params;
+router.put("/:employeeId", guard, validate, async (req, res) => {
+    const { employeeId } = req.params;
     const user = getCurrentUser(req);
 
     const employee = await Employee.findOne({ _id: employeeId, userCreatedId: user.userId });
@@ -163,7 +163,8 @@ router.put("/:id", guard, validate, async (req, res) => {
     res.end();
 });
 
-router.delete("/:id", guard, async (req, res) => {
+router.delete("/:employeeId", guard, async (req, res) => {
+    const { employeeId } = req.params;
     const user = getCurrentUser(req);
     await Employee.deleteOne({ _id: employeeId, userCreatedId: user.userId });
     res.end();
