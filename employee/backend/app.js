@@ -27,6 +27,12 @@ app.get("/", (req, res) => {
     });
 });
 
+app.use((err, req, res, next) => {
+    res.status(err.status || 500).send({
+        message: err.message || "Internal server error",
+    });
+});
+
 app.listen(4000, () => {
     console.log("listening on port 4000");
 });
