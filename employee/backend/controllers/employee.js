@@ -59,7 +59,7 @@ router.get("/", guard, async (req, res) => {
             { lastName: { $regex: search, $options: "i" } },
             { email: { $regex: search, $options: "i" } },
         ]
-    }).skip((page - 1) * limit).limit(limit);
+    }).sort({ _id: -1 }).skip((page - 1) * limit).limit(limit);
     res.send(data);
 });
 
@@ -88,7 +88,7 @@ router.get('/:employeeId/profile/:fileName', guard, async (req, res) => {
 router.post("/", guard, validate, async (req, res) => {
     const user = getCurrentUser(req);
     const item = JSON.parse(req.fields.data);
-    const file = req.files.profile?.[0];
+    const file = req.files.profile[0];
 
     const employee = new Employee({
         firstName: item.firstName,
@@ -166,8 +166,6 @@ router.put("/:employeeId", guard, validate, async (req, res) => {
             if (err) {
                 console.log(err);
             }
-
-            res.end();
         });
     }
 
