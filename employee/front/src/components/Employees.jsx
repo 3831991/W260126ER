@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
 import EmployeeForm from "./EmployeeForm";
@@ -6,6 +6,8 @@ import "./Employees.css";
 
 const API_URL = "http://localhost:4000";
 const TOKEN = localStorage.getItem("token");
+const PAGE_SIZE = 8;
+const SEARCH_DEBOUNCE_MS = 400;
 
 function authHeaders() {
     return {
@@ -53,6 +55,12 @@ export default function Employees() {
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [editingEmployee, setEditingEmployee] = useState(null);
     const [saving, setSaving] = useState(false);
+    const [page, setPage] = useState(1);
+    const [searchInput, setSearchInput] = useState("");
+    const [search, setSearch] = useState("");
+
+    // כל בקשה מקבלת מספר רץ, כך שתשובה של בקשה ישנה שהגיעה באיחור לא דורסת את החדשה
+    const requestIdRef = useRef(0);
 
     const { logout, user } = useAuth();
     const navigate = useNavigate();
@@ -62,23 +70,45 @@ export default function Employees() {
         navigate("/login", { replace: true });
     };
 
-    const getEmployees = async () => {
+    // השהיית החיפוש כדי לא לשלוח בקשה על כל הקלדה
+    useEffect(() => {
+        const timeoutId = setTimeout(() => {
+            setSearch(searchInput.trim());
+            setPage(1);
+        }, SEARCH_DEBOUNCE_MS);
+
+        return () => clearTimeout(timeoutId);
+    }, [searchInput]);
+
+    const getEmployees = useCallback(async () => {
+        const requestId = ++requestIdRef.current;
+
         setLoading(true);
 
-        const res = await fetch(`${API_URL}/employees`, {
+        const query = new URLSearchParams({
+            page: String(page),
+            limit: String(PAGE_SIZE),
+            search,
+        });
+
+        const res = await fetch(`${API_URL}/employees?${query}`, {
             headers: authHeaders(),
         });
+
+        if (requestId !== requestIdRef.current) {
+            return;
+        }
 
         if (res.ok) {
             setEmployees(await res.json());
         }
 
         setLoading(false);
-    };
+    }, [page, search]);
 
     useEffect(() => {
         getEmployees();
-    }, []);
+    }, [getEmployees]);
 
     const handleAddClick = () => {
         setEditingEmployee(null);
@@ -111,9 +141,17 @@ export default function Employees() {
         setSaving(false);
 
         if (res.ok) {
+            const wasEdit = Boolean(editingEmployee);
+
             setIsFormOpen(false);
             setEditingEmployee(null);
-            getEmployees();
+
+            // עובד חדש נוסף לסוף הרשימה, ובעריכה נשארים באותו עמוד
+            if (!wasEdit && page !== 1) {
+                setPage(1);
+            } else {
+                getEmployees();
+            }
         }
     };
 
@@ -132,9 +170,19 @@ export default function Employees() {
         });
 
         if (res.ok) {
-            getEmployees();
+            // אם נמחק הפריט האחרון בעמוד, חוזרים לעמוד הקודם
+            if (employees.length === 1 && page > 1) {
+                setPage(page - 1);
+            } else {
+                getEmployees();
+            }
         }
     };
+
+    // השרת מחזיר מערך בלבד ללא ספירה כוללת, לכן קיום עמוד הבא נגזר מעמוד מלא
+    const hasNextPage = employees.length === PAGE_SIZE;
+    const hasPrevPage = page > 1;
+    const showPagination = hasPrevPage || hasNextPage;
 
     return (
         <div className="employees-page">
@@ -151,9 +199,30 @@ export default function Employees() {
                 </div>
             </div>
 
+            <div className="employees-toolbar">
+                <input
+                    type="search"
+                    className="employees-search"
+                    placeholder="חיפוש עובד..."
+                    value={searchInput}
+                    onChange={e => setSearchInput(e.target.value)}
+                />
+                {searchInput && (
+                    <button
+                        type="button"
+                        className="employee-btn employee-btn-secondary"
+                        onClick={() => setSearchInput("")}
+                    >
+                        ניקוי
+                    </button>
+                )}
+            </div>
+
             {loading && <p className="employees-status">טוען עובדים...</p>}
             {!loading && employees.length === 0 && (
-                <p className="employees-status">אין עובדים להצגה</p>
+                <p className="employees-status">
+                    {search ? `לא נמצאו תוצאות עבור "${search}"` : "אין עובדים להצגה"}
+                </p>
             )}
 
             <div className="employees-grid">
@@ -229,6 +298,28 @@ export default function Employees() {
                     </div>
                 ))}
             </div>
+
+            {showPagination && (
+                <div className="employees-pagination">
+                    <button
+                        type="button"
+                        className="employee-btn employee-btn-secondary"
+                        onClick={() => setPage(page - 1)}
+                        disabled={!hasPrevPage || loading}
+                    >
+                        הקודם
+                    </button>
+                    <span className="employees-page-number">עמוד {page}</span>
+                    <button
+                        type="button"
+                        className="employee-btn employee-btn-secondary"
+                        onClick={() => setPage(page + 1)}
+                        disabled={!hasNextPage || loading}
+                    >
+                        הבא
+                    </button>
+                </div>
+            )}
 
             {isFormOpen && (
                 <EmployeeForm

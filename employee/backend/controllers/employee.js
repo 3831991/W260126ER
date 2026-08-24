@@ -45,10 +45,21 @@ const Employee = model("employees", EmployeeSchema);
 const router = Router();
 
 router.get("/", guard, async (req, res) => {
-    const { page = 1, limit = 20, search = "" } = req.query;
+    const {
+        page = 1,
+        limit = 20,
+        search = ""
+    } = req.query;
 
     const user = getCurrentUser(req);
-    const data = await Employee.find({ userCreatedId: user.userId }).skip((page - 1) * limit).limit(limit);
+    const data = await Employee.find({
+        userCreatedId: user.userId,
+        $or: [
+            { firstName: { $regex: search, $options: "i" } },
+            { lastName: { $regex: search, $options: "i" } },
+            { email: { $regex: search, $options: "i" } },
+        ]
+    }).skip((page - 1) * limit).limit(limit);
     res.send(data);
 });
 
