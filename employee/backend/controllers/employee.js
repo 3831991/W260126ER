@@ -154,6 +154,10 @@ router.put("/:employeeId", guard, validate, async (req, res) => {
     if (req.files.profile) {
         const file = req.files.profile[0];
 
+        if (!employee.profile) {
+            employee.profile = {};
+        }
+
         employee.profile.fileName   = file.originalFilename;
         employee.profile.size       = file.size;
         employee.profile.type       = file.mimetype;
