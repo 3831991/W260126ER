@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { Types } from "mongoose";
 import { Employee } from "./employee.js";
 import guard from '../services/guard.js';
 import { getCurrentUser } from "../services/utilities.js";
@@ -11,7 +12,8 @@ router.get("/cities", guard, async (req, res) => {
     const cities = await Employee.aggregate([
         {
             $match: {
-                userCreatedId: user.userId,
+                // aggregate לא עושה casting לפי הסכמה, לכן ההמרה ל-ObjectId ידנית
+                userCreatedId: new Types.ObjectId(user.userId),
             },
         },
         {
