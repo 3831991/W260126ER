@@ -2,7 +2,6 @@ import { model, Schema } from "mongoose";
 import { Router } from 'express';
 import bcrypt from "bcrypt";
 import jwt from 'jsonwebtoken';
-import { JWT_SECRET } from "../config.js";
 import guard from '../services/guard.js';
 
 const schema = new Schema({
@@ -37,7 +36,7 @@ router.post("/login", async (req, res) => {
         fullName: `${userFind.firstName} ${userFind.lastName}`,
     };
 
-    const token = jwt.sign(obj, JWT_SECRET, { expiresIn: '20m' });
+    const token = jwt.sign(obj, process.env.JWT_SECRET, { expiresIn: process.env.TOKEN_EXPIRES_IN });
 
     res.send(token);
 });
@@ -71,7 +70,7 @@ router.get("/renew-token", guard, async (req, res) => {
         fullName: data.fullName,
     }
 
-    const token = jwt.sign(obj, JWT_SECRET, { expiresIn: '20m' });
+    const token = jwt.sign(obj, process.env.JWT_SECRET, { expiresIn: process.env.TOKEN_EXPIRES_IN });
 
     res.send(token); 
 });

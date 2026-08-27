@@ -3,8 +3,9 @@ import cors from 'cors';
 import mongoose from 'mongoose';
 import AuthRouter from './controllers/auth.js'
 import EmployeesRouter from './controllers/employee.js';
+import "dotenv/config";
 
-await mongoose.connect('mongodb://127.0.0.1:27017/full-stack-W260126ER');
+await mongoose.connect(process.env.MONGO_URL);
 console.log('mongodb connection');
 
 const app = express();
@@ -12,7 +13,7 @@ const app = express();
 app.use(express.json());
 
 app.use(cors({
-    origin: true,
+    origin: process.env.FRONTEND_URL,
     credentials: true,
     methods: 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
     allowedHeaders: 'Content-Type, Accept, Authorization',
@@ -33,6 +34,6 @@ app.use((err, req, res, next) => {
     });
 });
 
-app.listen(4000, () => {
-    console.log("listening on port 4000");
+app.listen(process.env.PORT, () => {
+    console.log(`listening on port ${process.env.PORT}`);
 });
