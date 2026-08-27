@@ -40,7 +40,7 @@ const EmployeeSchema = new Schema({
     },
 });
 
-const Employee = model("employees", EmployeeSchema);
+export const Employee = model("employees", EmployeeSchema);
 
 const router = Router();
 

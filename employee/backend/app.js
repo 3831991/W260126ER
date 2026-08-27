@@ -3,6 +3,7 @@ import cors from 'cors';
 import mongoose from 'mongoose';
 import AuthRouter from './controllers/auth.js'
 import EmployeesRouter from './controllers/employee.js';
+import DashboardRouter from './controllers/dashboard.js';
 import "dotenv/config";
 
 await mongoose.connect(process.env.MONGO_URL);
@@ -21,6 +22,7 @@ app.use(cors({
 
 app.use("/", AuthRouter);
 app.use("/employees", EmployeesRouter);
+app.use("/dashboard", DashboardRouter);
 
 app.get("/", (req, res) => {
     res.send({

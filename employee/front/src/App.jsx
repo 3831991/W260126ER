@@ -1,7 +1,9 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import Dashboard from './pages/Dashboard';
 import Employees from './components/Employees';
+import Layout from './components/Layout';
 import ProtectedRoute from './context/ProtectedRoute';
 
 function App() {
@@ -10,15 +12,16 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
       <Route
-        path="/employees"
         element={
           <ProtectedRoute>
-            <Employees />
+            <Layout />
           </ProtectedRoute>
         }
-      />
-      <Route path="/" element={<Navigate to="/employees" replace />} />
-      <Route path="*" element={<Navigate to="/employees" replace />} />
+      >
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/employees" element={<Employees />} />
+      </Route>
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }

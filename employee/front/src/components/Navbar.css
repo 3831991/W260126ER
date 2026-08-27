@@ -1,0 +1,85 @@
+.navbar {
+  direction: rtl;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  padding: 0.9rem 1.5rem;
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+.navbar-brand {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #1f2937;
+  white-space: nowrap;
+}
+
+.navbar-links {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.navbar-link {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #4b5563;
+  text-decoration: none;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.navbar-link:hover {
+  background: #f3f4f6;
+  color: #1f2937;
+}
+
+.navbar-link-active {
+  background: #eef2ff;
+  color: #4f46e5;
+}
+
+.navbar-user {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-inline-start: auto;
+  color: #4b5563;
+  font-size: 0.95rem;
+}
+
+.navbar-logout {
+  border: 1px solid #d1d5db;
+  background: #fff;
+  border-radius: 8px;
+  padding: 0.45rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: inherit;
+  color: #374151;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.navbar-logout:hover {
+  background: #f9fafb;
+  border-color: #9ca3af;
+}
+
+@media (max-width: 640px) {
+  .navbar {
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .navbar-user {
+    margin-inline-start: 0;
+    width: 100%;
+    justify-content: space-between;
+  }
+}

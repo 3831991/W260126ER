@@ -1,11 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/useAuth";
 import EmployeeForm from "./EmployeeForm";
 import "./Employees.css";
 
 const API_URL = "http://localhost:4000";
-const TOKEN = localStorage.getItem("token");
 const PAGE_SIZE = 8;
 const SEARCH_DEBOUNCE_MS = 400;
 
@@ -34,7 +31,7 @@ function EmployeeAvatar({ employee }) {
         return (
             <img
                 className="employee-avatar employee-avatar-img"
-                src={`${API_URL}/employees/${employee._id}/profile/${employee.profile.fileName}?token=${TOKEN}`}
+                src={`${API_URL}/employees/${employee._id}/profile/${employee.profile.fileName}?token=${localStorage.getItem("token")}`}
                 alt={`${employee.firstName} ${employee.lastName}`}
                 onError={() => setImgError(true)}
             />
@@ -61,14 +58,6 @@ export default function Employees() {
 
     // כל בקשה מקבלת מספר רץ, כך שתשובה של בקשה ישנה שהגיעה באיחור לא דורסת את החדשה
     const requestIdRef = useRef(0);
-
-    const { logout, user } = useAuth();
-    const navigate = useNavigate();
-
-    const handleLogout = () => {
-        logout();
-        navigate("/login", { replace: true });
-    };
 
     // השהיית החיפוש כדי לא לשלוח בקשה על כל הקלדה
     useEffect(() => {
@@ -191,12 +180,6 @@ export default function Employees() {
                 <button className="employee-btn employee-btn-primary" onClick={handleAddClick}>
                     + הוספת עובד
                 </button>
-                <div className="employees-user">
-                    <span>שלום {user?.firstName || 'אורח'}</span>
-                    <button className="employee-btn employee-btn-secondary" onClick={handleLogout}>
-                        התנתקות
-                    </button>
-                </div>
             </div>
 
             <div className="employees-toolbar">
